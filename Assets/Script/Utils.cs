@@ -13,6 +13,14 @@ public enum FaceIndex
 	none
 }
 
+public enum ScreenInputDirectioin
+{
+	up,
+	down,
+	left,
+	right
+}
+
 public struct CubePos
 {
 	public int x;

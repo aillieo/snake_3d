@@ -32,6 +32,9 @@ public class GameManager : MonoBehaviour {
 
 		InitSnake ();
 
+		UIController uc = GameObject.Find ("UIController").GetComponent<UIController>();
+		uc.snakeCubeHead = snakeCubeHead;
+
 		InitFood ();
 
 	}
