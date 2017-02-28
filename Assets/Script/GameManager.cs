@@ -119,24 +119,25 @@ public class GameManager : MonoBehaviour {
 		float y = cp.y * cubeOffset;
 		float z = cp.z * cubeOffset;
 
-		CubePos deltaPos;
-		deltaPos.x = 0;
-		deltaPos.y = 1;
-		deltaPos.z = 0;
+		CubePos deltaCubePos;
+		deltaCubePos.x = 0;
+		deltaCubePos.y = 1;
+		deltaCubePos.z = 0;
 
-		snakeCubeHead = Instantiate (snakeCubeHead, new Vector3(0,0,0), Quaternion.Euler (new Vector3 (0, 0, 0))) as SnakeCubeHead;
+		snakeCubeHead = Instantiate (snakeCubeHead) as SnakeCubeHead;
 		snakeCubeHead.transform.localScale = new Vector3 (scale,scale,scale);
 		snakeCubeHead.transform.parent = GameObject.Find ("BasePoint").transform;
 		snakeCubeHead.transform.localPosition = new Vector3 (x, y, z);
-		snakeCubeHead.Init (cp, deltaPos, cubeOffset, config.matrixDim + 1, FaceIndex.z_neg);
+		snakeCubeHead.Init (cp, deltaCubePos, cubeOffset, config.moveInterval , config.matrixDim + 1, FaceIndex.z_neg);
 
 		for(int i = 3 ; i > 0 ; i--)
 		{
 			y = i * cubeOffset;
-			SnakeCube sc = Instantiate (snakeCube, new Vector3(0,0,0), Quaternion.Euler (new Vector3 (0, 0, 0))) as SnakeCube;
+			SnakeCube sc = Instantiate (snakeCube) as SnakeCube;
 			sc.transform.localScale = new Vector3 (scale,scale,scale);
 			sc.transform.parent = GameObject.Find ("BasePoint").transform;
 			sc.transform.localPosition = new Vector3 (x, y, z);
+			sc.SetMovePara (cubeOffset, config.moveInterval);
 
 			if(snakeCubes.Count == 0){
 

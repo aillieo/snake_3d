@@ -8,63 +8,95 @@ public class SnakeCubeHead : MonoBehaviour {
 
 	float cubeDistance;
 	int moveDim;
+	float moveTime;
+
 	FaceIndex currentFaceIndex;
 	FaceIndex nextFaceIndex;
-	CubePos cubePos;
-	CubePos deltaPos;
 
-	Transform cameraTransform;
+	CubePos cubePos;
+	CubePos deltaCubePos;
+
+	bool moving = false;
+	bool rotating = false;
+
+	Vector3 updateMove;
+	Vector3 updateRotate;
+	Vector3 targetPos;
+	Vector3 targetRot;
+	Vector3 rotateAxis;
+
+
+	Transform cameraFocusTransform;
 
 	// Use this for initialization
 	void Start () {
 
-
-		cameraTransform = Camera.main.transform;
+		cameraFocusTransform = GameObject.Find("CameraFocus").transform;
 
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+
+		if(moving)
+		{
+			transform.Translate (updateMove * Time.deltaTime);
+		}
+
+		if (rotating)
+		{
+			cameraFocusTransform.RotateAround (Vector3.zero,rotateAxis,90/moveTime * Time.deltaTime);
+		}
+
 	}
 
 	public bool CheckHead(){
 
 
+
+		moving = false;
+		rotating = false;
+		transform.localPosition = targetPos;
+		cameraFocusTransform.eulerAngles = targetRot;
+
+
+
+
 		nextFaceIndex = FaceIndex.none;
-		if (cubePos.x + deltaPos.x < 0) {
+		if (cubePos.x + deltaCubePos.x < 0) {
 			//Debug.Log ("x neg");
 			nextFaceIndex = FaceIndex.x_neg;
 		}
-		else if(cubePos.x + deltaPos.x > moveDim )
+		else if(cubePos.x + deltaCubePos.x > moveDim )
 		{
 			//Debug.Log ("x pos");
 			nextFaceIndex = FaceIndex.x_pos;
 		}
-		else if (cubePos.y + deltaPos.y < 0) {
+		else if (cubePos.y + deltaCubePos.y < 0) {
 			//Debug.Log ("y neg");
 			nextFaceIndex = FaceIndex.y_neg;
 		}
-		else if(cubePos.y + deltaPos.y > moveDim )
+		else if(cubePos.y + deltaCubePos.y > moveDim )
 		{
 			//Debug.Log ("y pos");
 			nextFaceIndex = FaceIndex.y_pos;
 		}
-		else if (cubePos.z + deltaPos.z < 0) {
+		else if (cubePos.z + deltaCubePos.z < 0) {
 			//Debug.Log ("z neg");
 			nextFaceIndex = FaceIndex.z_neg;
 		}
-		else if(cubePos.z + deltaPos.z > moveDim )
+		else if(cubePos.z + deltaCubePos.z > moveDim )
 		{
 			//Debug.Log ("z pos");
 			nextFaceIndex = FaceIndex.z_pos;
 		}
 
 
-		updateCamera ();
+
 
 
 		if (nextFaceIndex != FaceIndex.none) {
+			UpdateCamera ();
 			HandleEdge ();
 		}
 
@@ -73,36 +105,19 @@ public class SnakeCubeHead : MonoBehaviour {
 
 
 
-	void updateCamera(){
-	
-		switch(nextFaceIndex){
+	void UpdateCamera(){
 
-		case FaceIndex.x_neg:
-			cameraTransform.position = new Vector3 (-30,0,0);
-			cameraTransform.eulerAngles = new Vector3 (0,90,0);
-			break;
-		case FaceIndex.x_pos:
-			cameraTransform.position = new Vector3 (30,0,0);
-			cameraTransform.eulerAngles = new Vector3 (0,-90,0);
-			break;
-		case FaceIndex.y_neg:
-			cameraTransform.position = new Vector3 (0,-30,0);
-			cameraTransform.eulerAngles = new Vector3 (-90,0,0);
-			break;
-		case FaceIndex.y_pos:
-			cameraTransform.position = new Vector3 (0,30,0);
-			cameraTransform.eulerAngles = new Vector3 (90,0,0);
-			break;
-		case FaceIndex.z_neg:
-			cameraTransform.position = new Vector3 (0,0,-30);
-			cameraTransform.eulerAngles = new Vector3 (0,0,0);
-			break;
-		case FaceIndex.z_pos:
-			cameraTransform.position = new Vector3 (0,0,30);
-			cameraTransform.eulerAngles = new Vector3 (0,180,0);
-			break;
-		}
-	
+		Vector3 vecCurrent = Utils.getVector3ByFaceIndex (currentFaceIndex);
+		Vector3 vecNext = Utils.getVector3ByFaceIndex (nextFaceIndex);
+		rotateAxis = Vector3.Cross (vecCurrent, vecNext);
+
+		Transform targetTrans = cameraFocusTransform;
+		targetTrans.RotateAround (Vector3.zero,rotateAxis,90);
+		targetRot = targetTrans.eulerAngles;
+		targetTrans.RotateAround (Vector3.zero,rotateAxis,-90);
+
+		rotating = true;
+
 	}
 
 	void HandleEdge(){
@@ -110,22 +125,22 @@ public class SnakeCubeHead : MonoBehaviour {
 		switch(nextFaceIndex){
 
 		case FaceIndex.x_neg:
-			deltaPos.x = 0;
+			deltaCubePos.x = 0;
 			break;
 		case FaceIndex.x_pos:
-			deltaPos.x = 0;
+			deltaCubePos.x = 0;
 			break;
 		case FaceIndex.y_neg:
-			deltaPos.y = 0;
+			deltaCubePos.y = 0;
 			break;
 		case FaceIndex.y_pos:
-			deltaPos.y = 0;
+			deltaCubePos.y = 0;
 			break;
 		case FaceIndex.z_neg:
-			deltaPos.z = 0;
+			deltaCubePos.z = 0;
 			break;
 		case FaceIndex.z_pos:
-			deltaPos.z = 0;
+			deltaCubePos.z = 0;
 			break;
 		}
 
@@ -133,22 +148,22 @@ public class SnakeCubeHead : MonoBehaviour {
 		switch(currentFaceIndex){
 
 		case FaceIndex.x_neg:
-			deltaPos.x = 1;
+			deltaCubePos.x = 1;
 			break;
 		case FaceIndex.x_pos:
-			deltaPos.x = -1;
+			deltaCubePos.x = -1;
 			break;
 		case FaceIndex.y_neg:
-			deltaPos.y = 1;
+			deltaCubePos.y = 1;
 			break;
 		case FaceIndex.y_pos:
-			deltaPos.y = -1;
+			deltaCubePos.y = -1;
 			break;
 		case FaceIndex.z_neg:
-			deltaPos.z = 1;
+			deltaCubePos.z = 1;
 			break;
 		case FaceIndex.z_pos:
-			deltaPos.z = -1;
+			deltaCubePos.z = -1;
 			break;
 		}
 
@@ -162,28 +177,38 @@ public class SnakeCubeHead : MonoBehaviour {
 
 	public void Move(){
 	
-		cubePos.x += deltaPos.x;
-		cubePos.y += deltaPos.y;
-		cubePos.z += deltaPos.z;
-		this.transform.localPosition = new Vector3(cubePos.x * cubeDistance, cubePos.y * cubeDistance , cubePos.z * cubeDistance);
+		cubePos.x += deltaCubePos.x;
+		cubePos.y += deltaCubePos.y;
+		cubePos.z += deltaCubePos.z;
+
+
+		targetPos = new Vector3(cubePos.x * cubeDistance, cubePos.y * cubeDistance , cubePos.z * cubeDistance);
+
+		updateMove = (targetPos - transform.localPosition) / moveTime;
+
+		moving = true;
+
 
 	}
 
 
 
-	public void Init(CubePos cp, CubePos dp, float cd, int md , FaceIndex cfi){
+	public void Init(CubePos cp, CubePos dcp, float cd, float mt ,int md , FaceIndex cfi){
 
 		cubePos = cp;
-		deltaPos = dp;
+		deltaCubePos = dcp;
 		cubeDistance = cd;
+		moveTime = mt;
 		moveDim = md;
 		currentFaceIndex = cfi;
 
+		targetPos = new Vector3(cubePos.x * cubeDistance, cubePos.y * cubeDistance , cubePos.z * cubeDistance);
+
 	}
 
-	public void SetDeltaPos(CubePos delta ){
+	public void SetDeltaCubePos(CubePos delta ){
 
-		deltaPos = delta;
+		deltaCubePos = delta;
 
 	}
 

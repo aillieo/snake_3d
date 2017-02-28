@@ -20,7 +20,10 @@ public struct CubePos
 	public int z;
 }
 
-public static class utils
+
+
+
+public static class Utils
 {
 	public static void SetComponentX(this Transform trans , float x)
 	{
@@ -35,6 +38,28 @@ public static class utils
 	public static void SetComponentZ(this Transform trans , float z)
 	{
 		trans.position = new Vector3 (trans.position.x, trans.position.y , z);
+	}
+
+
+	public static Vector3 getVector3ByFaceIndex(FaceIndex fi)
+	{
+		switch(fi){
+
+		case FaceIndex.x_neg:
+			return new Vector3 (-1,0,0);
+		case FaceIndex.x_pos:
+			return new Vector3 (1,0,0);
+		case FaceIndex.y_neg:
+			return new Vector3 (0,-1,0);
+		case FaceIndex.y_pos:
+			return new Vector3 (0,1,0);
+		case FaceIndex.z_neg:
+			return new Vector3 (0,0,-1);
+		case FaceIndex.z_pos:
+			return new Vector3 (0,0,1);
+		}
+
+		return Vector3.zero;
 	}
 
 }

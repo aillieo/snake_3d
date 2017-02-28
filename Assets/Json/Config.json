@@ -2,5 +2,5 @@
 	"matrixDim" : 7,
 	"gapSize" : 0.2,
 	"cubeSize" : 1.6,
-	"moveInterval" : 0.5
+	"moveInterval" : 1.0
 }
