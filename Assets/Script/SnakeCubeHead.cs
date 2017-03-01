@@ -20,11 +20,13 @@ public class SnakeCubeHead : MonoBehaviour {
 	bool rotating = false;
 
 	Vector3 updateMove;
-	Vector3 updateRotate;
+	float updateRotate;
 	Vector3 targetPos;
 	Vector3 targetRot;
 	Vector3 rotateAxis;
+	Vector3 rotateBase;
 
+	bool willRotate = false;
 
 	Transform cameraFocusTransform;
 
@@ -38,15 +40,23 @@ public class SnakeCubeHead : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if(moving)
-		{
-			transform.Translate (updateMove * Time.deltaTime);
-		}
-
 		if (rotating)
 		{
-			cameraFocusTransform.RotateAround (Vector3.zero,rotateAxis,90/moveTime * Time.deltaTime);
+
+			transform.RotateAround (rotateBase, new Vector3(1,0,0),updateRotate*Time.deltaTime);
+			cameraFocusTransform.eulerAngles = transform.eulerAngles;
+
 		}
+
+		if(moving)
+		{
+
+			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
+
+			
+		}
+
+
 
 	}
 
@@ -57,10 +67,7 @@ public class SnakeCubeHead : MonoBehaviour {
 		moving = false;
 		rotating = false;
 		transform.localPosition = targetPos;
-		cameraFocusTransform.eulerAngles = targetRot;
-
-
-
+		transform.eulerAngles = targetRot;
 
 		nextFaceIndex = FaceIndex.none;
 		if (cubePos.x + deltaCubePos.x < 0) {
@@ -96,7 +103,7 @@ public class SnakeCubeHead : MonoBehaviour {
 
 
 		if (nextFaceIndex != FaceIndex.none) {
-			UpdateCamera ();
+
 			HandleEdge ();
 		}
 
@@ -105,42 +112,36 @@ public class SnakeCubeHead : MonoBehaviour {
 
 
 
-	void UpdateCamera(){
-
-		Vector3 vecCurrent = Utils.getVector3ByFaceIndex (currentFaceIndex);
-		Vector3 vecNext = Utils.getVector3ByFaceIndex (nextFaceIndex);
-		rotateAxis = Vector3.Cross (vecCurrent, vecNext);
-
-		Transform targetTrans = cameraFocusTransform;
-		targetTrans.RotateAround (Vector3.zero,rotateAxis,90);
-		targetRot = targetTrans.eulerAngles;
-		targetTrans.RotateAround (Vector3.zero,rotateAxis,-90);
-
-		rotating = true;
-
-	}
 
 	void HandleEdge(){
+
+		Vector3 rotateOffset = new Vector3 (0, 0, 0);
 
 		switch(nextFaceIndex){
 
 		case FaceIndex.x_neg:
 			deltaCubePos.x = 0;
+			rotateOffset.x = 0.5f;
 			break;
 		case FaceIndex.x_pos:
 			deltaCubePos.x = 0;
+			rotateOffset.x = -0.5f;
 			break;
 		case FaceIndex.y_neg:
 			deltaCubePos.y = 0;
+			rotateOffset.y = 0.5f;
 			break;
 		case FaceIndex.y_pos:
 			deltaCubePos.y = 0;
+			rotateOffset.y = -0.5f;
 			break;
 		case FaceIndex.z_neg:
 			deltaCubePos.z = 0;
+			rotateOffset.z = 0.5f;
 			break;
 		case FaceIndex.z_pos:
 			deltaCubePos.z = 0;
+			rotateOffset.z = -0.5f;
 			break;
 		}
 
@@ -149,24 +150,41 @@ public class SnakeCubeHead : MonoBehaviour {
 
 		case FaceIndex.x_neg:
 			deltaCubePos.x = 1;
+			rotateOffset.x = 0.5f;
 			break;
 		case FaceIndex.x_pos:
 			deltaCubePos.x = -1;
+			rotateOffset.x = -0.5f;
 			break;
 		case FaceIndex.y_neg:
 			deltaCubePos.y = 1;
+			rotateOffset.y = 0.5f;
 			break;
 		case FaceIndex.y_pos:
 			deltaCubePos.y = -1;
+			rotateOffset.y = -0.5f;
 			break;
 		case FaceIndex.z_neg:
 			deltaCubePos.z = 1;
+			rotateOffset.z = 0.5f;
 			break;
 		case FaceIndex.z_pos:
 			deltaCubePos.z = -1;
+			rotateOffset.z = -0.5f;
 			break;
 		}
 
+		willRotate = true;
+
+		Vector3 vecCurrent = Utils.getVector3ByFaceIndex (currentFaceIndex);
+		Vector3 vecNext = Utils.getVector3ByFaceIndex (nextFaceIndex);
+		rotateAxis = Vector3.Cross (vecCurrent, vecNext);
+
+		transform.RotateAround (rotateBase,rotateAxis,90);
+		targetRot = transform.eulerAngles;
+		transform.RotateAround (rotateBase,rotateAxis,-90);
+
+		rotateBase = transform.position + rotateOffset * cubeDistance;
 
 		currentFaceIndex = nextFaceIndex;
 
@@ -177,17 +195,24 @@ public class SnakeCubeHead : MonoBehaviour {
 
 	public void Move(){
 	
+
 		cubePos.x += deltaCubePos.x;
 		cubePos.y += deltaCubePos.y;
 		cubePos.z += deltaCubePos.z;
+		targetPos = new Vector3 (cubePos.x * cubeDistance, cubePos.y * cubeDistance, cubePos.z * cubeDistance);
+
+		if (willRotate) {
 
 
-		targetPos = new Vector3(cubePos.x * cubeDistance, cubePos.y * cubeDistance , cubePos.z * cubeDistance);
+			updateRotate = 90 / moveTime;
+			rotating = true;
+			willRotate = false;
+					
+		} else {
 
-		updateMove = (targetPos - transform.localPosition) / moveTime;
-
-		moving = true;
-
+			updateMove = (targetPos - transform.localPosition) / moveTime;
+			moving = true;
+		}
 
 	}
 

@@ -133,6 +133,8 @@ public class GameManager : MonoBehaviour {
 		snakeCubeHead.transform.localPosition = new Vector3 (x, y, z);
 		snakeCubeHead.Init (cp, deltaCubePos, cubeOffset, config.moveInterval , config.matrixDim + 1, FaceIndex.z_neg);
 
+
+
 		for(int i = 3 ; i > 0 ; i--)
 		{
 			y = i * cubeOffset;
