@@ -16,8 +16,8 @@ public class SnakeCubeHead : MonoBehaviour {
 	CubePos cubePos;
 	CubePos deltaCubePos;
 
-	bool moving = false;
-	bool rotating = false;
+	//bool moving = false;
+	//bool rotating = false;
 
 	Vector3 updateMove;
 	float updateRotate;
@@ -40,23 +40,6 @@ public class SnakeCubeHead : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if (rotating)
-		{
-
-			transform.RotateAround (rotateBase, new Vector3(1,0,0),updateRotate*Time.deltaTime);
-			cameraFocusTransform.eulerAngles = transform.eulerAngles;
-
-		}
-
-		if(moving)
-		{
-
-			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
-
-			
-		}
-
-
 
 	}
 
@@ -64,8 +47,8 @@ public class SnakeCubeHead : MonoBehaviour {
 
 
 
-		moving = false;
-		rotating = false;
+		//moving = false;
+		//rotating = false;
 		transform.localPosition = targetPos;
 		transform.eulerAngles = targetRot;
 
@@ -205,18 +188,49 @@ public class SnakeCubeHead : MonoBehaviour {
 
 
 			updateRotate = 90 / moveTime;
-			rotating = true;
+			//rotating = true;
 			willRotate = false;
+			StartCoroutine (IRotate());
 					
 		} else {
 
 			updateMove = (targetPos - transform.localPosition) / moveTime;
-			moving = true;
+			//moving = true;
+			StartCoroutine (IMove());
 		}
 
 	}
 
 
+	IEnumerator IMove()
+	{
+
+		float t = 0;
+		while(t<moveTime)
+		{
+			t += Time.deltaTime;
+			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
+			yield return new WaitForEndOfFrame ();
+		}
+
+
+	}
+
+
+	IEnumerator IRotate()
+	{
+
+		float t = 0;
+		while(t<moveTime)
+		{
+			t += Time.deltaTime;
+			transform.RotateAround (rotateBase, new Vector3(1,0,0),updateRotate*Time.deltaTime);
+			cameraFocusTransform.eulerAngles = transform.eulerAngles;
+			yield return new WaitForEndOfFrame ();
+		}
+
+
+	}
 
 	public void Init(CubePos cp, CubePos dcp, float cd, float mt ,int md , FaceIndex cfi){
 
