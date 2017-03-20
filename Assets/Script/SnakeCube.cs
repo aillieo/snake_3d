@@ -21,11 +21,6 @@ public class SnakeCube : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-		if(moving)
-		{
-			transform.Translate(updateMove * Time.deltaTime);
-		}
-
 	}
 
 	public void SetNextSnakeCubeTrans( Transform trans){
@@ -49,9 +44,24 @@ public class SnakeCube : MonoBehaviour {
 	public void Move(){
 	
 		//transform.localPosition = nextPos;
-		updateMove = nextPos - transform.localPosition;
-		updateMove = updateMove / moveTime;
-		moving = true;
+		updateMove = (nextPos - transform.localPosition) / moveTime;
+		//moving = true;
+		StartCoroutine(IMove());
+
+	}
+
+	IEnumerator IMove(){
+
+		float movedDis = 0;
+		while (movedDis <= moveDistance) {
+		
+			movedDis += updateMove.magnitude * Time.deltaTime;
+			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
+			yield return new WaitForEndOfFrame ();
+		
+		}
+		transform.localPosition = nextPos;
+
 	}
 
 }

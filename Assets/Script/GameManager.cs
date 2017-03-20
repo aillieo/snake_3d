@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 		//Debug.Log ("gapSize" + config.gapSize.ToString());
 		//Debug.Log ("matrixDim" + config.matrixDim.ToString());
 
-		float baseOffset = (-0.5f)*(config.cubeSize*config.matrixDim + config.gapSize*(config.matrixDim -1));
+		float baseOffset = (-0.5f)*(config.cubeSize*config.matrixDim);
 		GameObject.Find ("BasePoint").transform.position = new Vector3 (baseOffset,baseOffset,baseOffset);
 
 		InitCubeMatrix ();
@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour {
 	void InitCubeMatrix(){
 
 		float dim = config.matrixDim;
-		float cubeOffset = config.cubeSize + config.gapSize;
+		float cubeOffset = config.cubeSize;
 		float scale = config.cubeSize;
 
 		for (int i = 1; i < dim+1; i++) {
@@ -104,9 +104,10 @@ public class GameManager : MonoBehaviour {
 
 
 		int dim = config.matrixDim;
-		float cubeOffset = config.cubeSize + config.gapSize;
+		float cubeOffset = config.cubeSize;
 		float scale = config.cubeSize;
 		CubePos cp;
+		float moveTime = 0.9f * config.moveInterval;
 
 		cp.x = 0;
 		cp.y = 4;
@@ -131,7 +132,7 @@ public class GameManager : MonoBehaviour {
 		snakeCubeHead.transform.localScale = new Vector3 (scale,scale,scale);
 		snakeCubeHead.transform.parent = GameObject.Find ("BasePoint").transform;
 		snakeCubeHead.transform.localPosition = new Vector3 (x, y, z);
-		snakeCubeHead.Init (cp, deltaCubePos, cubeOffset, config.moveInterval , config.matrixDim + 1, FaceIndex.z_neg);
+		snakeCubeHead.Init (cp, deltaCubePos, cubeOffset, moveTime , config.matrixDim + 1, FaceIndex.z_neg);
 
 
 
@@ -142,7 +143,7 @@ public class GameManager : MonoBehaviour {
 			sc.transform.localScale = new Vector3 (scale,scale,scale);
 			sc.transform.parent = GameObject.Find ("BasePoint").transform;
 			sc.transform.localPosition = new Vector3 (x, y, z);
-			sc.SetMovePara (cubeOffset, config.moveInterval);
+			sc.SetMovePara (cubeOffset, moveTime);
 
 			if(snakeCubes.Count == 0){
 

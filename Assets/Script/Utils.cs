@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public enum FaceIndex
 {
 	x_pos,
@@ -13,13 +14,16 @@ public enum FaceIndex
 	none
 }
 
+
 public enum ScreenInputDirectioin
 {
 	up,
 	down,
 	left,
-	right
+	right,
+	none
 }
+
 
 public struct CubePos
 {
@@ -49,6 +53,15 @@ public static class Utils
 	}
 
 
+
+	public static Vector3 toVec3(this CubePos cp, float cubeSize)
+	{
+		return new Vector3 ((float)cp.x * cubeSize, (float)cp.y * cubeSize, (float)cp.z * cubeSize);
+	}
+
+
+
+
 	public static Vector3 getVector3ByFaceIndex(FaceIndex fi)
 	{
 		switch(fi){
@@ -69,5 +82,7 @@ public static class Utils
 
 		return Vector3.zero;
 	}
+
+
 
 }

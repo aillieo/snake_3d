@@ -16,7 +16,7 @@ public class SnakeCubeHead : MonoBehaviour {
 	CubePos cubePos;
 	CubePos deltaCubePos;
 
-	//bool moving = false;
+	bool moving = false;
 	//bool rotating = false;
 
 	Vector3 updateMove;
@@ -25,15 +25,27 @@ public class SnakeCubeHead : MonoBehaviour {
 	Vector3 targetRot;
 	Vector3 rotateAxis;
 	Vector3 rotateBase;
+	float rotateAngle;
+
+	Transform left_bottom;
+	Transform right_bottom;
+	Transform left_top;
+	Transform right_top;
 
 	bool willRotate = false;
 
 	Transform cameraFocusTransform;
 
+	ScreenInputDirectioin screenInputDirectioin = ScreenInputDirectioin.none;
+
 	// Use this for initialization
 	void Start () {
 
 		cameraFocusTransform = GameObject.Find("CameraFocus").transform;
+		left_bottom = GameObject.Find("Left_Bottom").transform;
+		right_bottom = GameObject.Find("Right_Bottom").transform;
+		left_top = GameObject.Find("Left_Top").transform;
+		right_top = GameObject.Find("Right_Top").transform;
 
 	}
 	
@@ -51,6 +63,15 @@ public class SnakeCubeHead : MonoBehaviour {
 		//rotating = false;
 		transform.localPosition = targetPos;
 		transform.eulerAngles = targetRot;
+
+		if(screenInputDirectioin != ScreenInputDirectioin.none)
+		{
+			HandleOperation ();
+			screenInputDirectioin = ScreenInputDirectioin.none;
+			return true;
+		}
+
+
 
 		nextFaceIndex = FaceIndex.none;
 		if (cubePos.x + deltaCubePos.x < 0) {
@@ -94,37 +115,73 @@ public class SnakeCubeHead : MonoBehaviour {
 	}
 
 
+	void HandleOperation()
+	{
+
+		if (screenInputDirectioin == ScreenInputDirectioin.none) {
+			return;
+		}
+
+		Vector3 deltaVec3 = new Vector3();
+		if (screenInputDirectioin == ScreenInputDirectioin.left) {
+			rotateAngle = 90f;
+			rotateBase = left_bottom.position;
+			rotateAxis = left_bottom.position - left_top.position;
+			deltaVec3 = left_bottom.position - right_bottom.position;
+
+		} 
+		else if (screenInputDirectioin == ScreenInputDirectioin.right) {
+			rotateAngle = 90f;
+			rotateBase = right_bottom.position;
+			rotateAxis = right_top.position - right_bottom.position;
+			deltaVec3 = right_bottom.position - left_bottom.position;
+		}
+
+
+		deltaCubePos.x = (int)deltaVec3.x;
+		deltaCubePos.y = (int)deltaVec3.y;
+		deltaCubePos.z = (int)deltaVec3.z;
+
+
+		willRotate = true;
+
+
+		transform.RotateAround (rotateBase,rotateAxis,rotateAngle);
+		targetRot = transform.eulerAngles;
+		transform.RotateAround (rotateBase,rotateAxis,-rotateAngle);
+
+	}
 
 
 	void HandleEdge(){
 
-		Vector3 rotateOffset = new Vector3 (0, 0, 0);
+		//Vector3 rotateOffset = new Vector3 (0, 0, 0);
 
 		switch(nextFaceIndex){
 
 		case FaceIndex.x_neg:
 			deltaCubePos.x = 0;
-			rotateOffset.x = 0.5f;
+			//rotateOffset.x = 0.5f;
 			break;
 		case FaceIndex.x_pos:
 			deltaCubePos.x = 0;
-			rotateOffset.x = -0.5f;
+			//rotateOffset.x = -0.5f;
 			break;
 		case FaceIndex.y_neg:
 			deltaCubePos.y = 0;
-			rotateOffset.y = 0.5f;
+			//rotateOffset.y = 0.5f;
 			break;
 		case FaceIndex.y_pos:
 			deltaCubePos.y = 0;
-			rotateOffset.y = -0.5f;
+			//rotateOffset.y = -0.5f;
 			break;
 		case FaceIndex.z_neg:
 			deltaCubePos.z = 0;
-			rotateOffset.z = 0.5f;
+			//rotateOffset.z = 0.5f;
 			break;
 		case FaceIndex.z_pos:
 			deltaCubePos.z = 0;
-			rotateOffset.z = -0.5f;
+			//rotateOffset.z = -0.5f;
 			break;
 		}
 
@@ -133,27 +190,27 @@ public class SnakeCubeHead : MonoBehaviour {
 
 		case FaceIndex.x_neg:
 			deltaCubePos.x = 1;
-			rotateOffset.x = 0.5f;
+			//rotateOffset.x = 0.5f;
 			break;
 		case FaceIndex.x_pos:
 			deltaCubePos.x = -1;
-			rotateOffset.x = -0.5f;
+			//rotateOffset.x = -0.5f;
 			break;
 		case FaceIndex.y_neg:
 			deltaCubePos.y = 1;
-			rotateOffset.y = 0.5f;
+			//rotateOffset.y = 0.5f;
 			break;
 		case FaceIndex.y_pos:
 			deltaCubePos.y = -1;
-			rotateOffset.y = -0.5f;
+			//rotateOffset.y = -0.5f;
 			break;
 		case FaceIndex.z_neg:
 			deltaCubePos.z = 1;
-			rotateOffset.z = 0.5f;
+			//rotateOffset.z = 0.5f;
 			break;
 		case FaceIndex.z_pos:
 			deltaCubePos.z = -1;
-			rotateOffset.z = -0.5f;
+			//rotateOffset.z = -0.5f;
 			break;
 		}
 
@@ -163,16 +220,25 @@ public class SnakeCubeHead : MonoBehaviour {
 		Vector3 vecNext = Utils.getVector3ByFaceIndex (nextFaceIndex);
 		rotateAxis = Vector3.Cross (vecCurrent, vecNext);
 
-		transform.RotateAround (rotateBase,rotateAxis,90);
+		rotateBase = 0.5f * (right_bottom.position + left_bottom.position );
+		rotateAngle = 90;
+		transform.RotateAround (rotateBase,rotateAxis,rotateAngle);
 		targetRot = transform.eulerAngles;
-		transform.RotateAround (rotateBase,rotateAxis,-90);
+		transform.RotateAround (rotateBase,rotateAxis,-rotateAngle);
 
-		rotateBase = transform.position + rotateOffset * cubeDistance;
+		//rotateBase = transform.position + rotateOffset * cubeDistance;
+
 
 		currentFaceIndex = nextFaceIndex;
 
 
 
+	}
+
+
+	public void HandleInput (ScreenInputDirectioin sid)
+	{
+		screenInputDirectioin = sid;
 	}
 
 
@@ -187,7 +253,7 @@ public class SnakeCubeHead : MonoBehaviour {
 		if (willRotate) {
 
 
-			updateRotate = 90 / moveTime;
+			updateRotate = rotateAngle / moveTime;
 			//rotating = true;
 			willRotate = false;
 			StartCoroutine (IRotate());
@@ -195,7 +261,7 @@ public class SnakeCubeHead : MonoBehaviour {
 		} else {
 
 			updateMove = (targetPos - transform.localPosition) / moveTime;
-			//moving = true;
+			moving = true;
 			StartCoroutine (IMove());
 		}
 
@@ -205,13 +271,14 @@ public class SnakeCubeHead : MonoBehaviour {
 	IEnumerator IMove()
 	{
 
-		float t = 0;
-		while(t<moveTime)
+		float movedDis = 0;
+		while(movedDis < cubeDistance)
 		{
-			t += Time.deltaTime;
+			movedDis += updateMove.magnitude * Time.deltaTime;
 			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
 			yield return new WaitForEndOfFrame ();
 		}
+		moving = false;
 
 
 	}
@@ -220,11 +287,11 @@ public class SnakeCubeHead : MonoBehaviour {
 	IEnumerator IRotate()
 	{
 
-		float t = 0;
-		while(t<moveTime)
+		float rotatedAngle = 0;
+		while( rotatedAngle < 90)
 		{
-			t += Time.deltaTime;
-			transform.RotateAround (rotateBase, new Vector3(1,0,0),updateRotate*Time.deltaTime);
+			rotatedAngle += updateRotate*Time.deltaTime;
+			transform.RotateAround (rotateBase, rotateAxis,updateRotate*Time.deltaTime);
 			cameraFocusTransform.eulerAngles = transform.eulerAngles;
 			yield return new WaitForEndOfFrame ();
 		}

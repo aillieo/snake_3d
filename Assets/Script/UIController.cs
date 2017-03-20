@@ -39,10 +39,10 @@ public class UIController : MonoBehaviour {
 	}
 
 
-	void changeSnakeDirection (ScreenInputDirectioin id)
+	void changeSnakeDirection (ScreenInputDirectioin sid)
 	{
 		
-		switch(id)
+		switch(sid)
 		{
 
 		case ScreenInputDirectioin.up:
@@ -58,16 +58,13 @@ public class UIController : MonoBehaviour {
 		case ScreenInputDirectioin.left:
 
 			Debug.Log ("Left");
-//			CubePos cp;
-//			cp.x = 1;
-//			cp.y = 0;
-//			cp.z = 0;
-//			snakeCubeHead.SetDeltaCubePos (cp);
+			snakeCubeHead.HandleInput (sid);
 			break;
 
 		case ScreenInputDirectioin.right:
 
 			Debug.Log ("Right");
+			snakeCubeHead.HandleInput (sid);
 			break;
 
 		}
