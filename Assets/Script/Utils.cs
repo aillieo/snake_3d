@@ -24,6 +24,12 @@ public enum ScreenInputDirectioin
 	none
 }
 
+public enum SnakeChangeDirection
+{
+	left,
+	right,
+	none
+}
 
 public struct CubePos
 {
@@ -54,7 +60,7 @@ public static class Utils
 
 
 
-	public static Vector3 toVec3(this CubePos cp, float cubeSize)
+	public static Vector3 ToVec3(this CubePos cp, float cubeSize)
 	{
 		return new Vector3 ((float)cp.x * cubeSize, (float)cp.y * cubeSize, (float)cp.z * cubeSize);
 	}
@@ -62,7 +68,7 @@ public static class Utils
 
 
 
-	public static Vector3 getVector3ByFaceIndex(FaceIndex fi)
+	public static Vector3 GetVector3ByFaceIndex(FaceIndex fi)
 	{
 		switch(fi){
 
@@ -84,5 +90,14 @@ public static class Utils
 	}
 
 
+	public static float GetAngleWithDirection(Vector2 from, Vector2 to){
+
+		float ret = Vector2.Angle (from , to);
+		if ((Vector3.Cross (from, to)).z > 0) {
+			return ret;
+		} else {
+			return -ret;
+		}
+	}
 
 }

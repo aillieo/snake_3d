@@ -137,6 +137,7 @@ MonoBehaviour:
     type: 2}
   snakeCubeHead: {fileID: 114934135058197678, guid: a5bff8c69d9bb4c288b96bdc9e043476,
     type: 2}
+  food: {fileID: 114309736618138980, guid: 88f8c973dcb634313b6642f5bd9ad98d, type: 2}
 --- !u!1 &954691600
 GameObject:
   m_ObjectHideFlags: 0

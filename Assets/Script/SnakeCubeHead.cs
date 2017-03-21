@@ -16,7 +16,7 @@ public class SnakeCubeHead : MonoBehaviour {
 	CubePos cubePos;
 	CubePos deltaCubePos;
 
-	bool moving = false;
+	//bool moving = false;
 	//bool rotating = false;
 
 	Vector3 updateMove;
@@ -33,10 +33,11 @@ public class SnakeCubeHead : MonoBehaviour {
 	Transform right_top;
 
 	bool willRotate = false;
+	bool willRotateCamera = false;
 
 	Transform cameraFocusTransform;
 
-	ScreenInputDirectioin screenInputDirectioin = ScreenInputDirectioin.none;
+	SnakeChangeDirection snakeChangeDirection = SnakeChangeDirection.none;
 
 	// Use this for initialization
 	void Start () {
@@ -58,21 +59,15 @@ public class SnakeCubeHead : MonoBehaviour {
 	public bool CheckHead(){
 
 
-
+		// change snake to target state
 		//moving = false;
 		//rotating = false;
 		transform.localPosition = targetPos;
 		transform.eulerAngles = targetRot;
 
-		if(screenInputDirectioin != ScreenInputDirectioin.none)
-		{
-			HandleOperation ();
-			screenInputDirectioin = ScreenInputDirectioin.none;
-			return true;
-		}
 
 
-
+		// whether snake head need rotate over edge
 		nextFaceIndex = FaceIndex.none;
 		if (cubePos.x + deltaCubePos.x < 0) {
 			//Debug.Log ("x neg");
@@ -101,36 +96,51 @@ public class SnakeCubeHead : MonoBehaviour {
 			//Debug.Log ("z pos");
 			nextFaceIndex = FaceIndex.z_pos;
 		}
-
-
-
-
-
 		if (nextFaceIndex != FaceIndex.none) {
 
 			HandleEdge ();
+			return true;
+		}
+
+		// whether there is a operation to handle
+		if(snakeChangeDirection != SnakeChangeDirection.none)
+		{
+			HandleOperation ();
+			snakeChangeDirection = SnakeChangeDirection.none;
+			return true;
+		}
+
+
+		// whether there is food before snake
+		bool hasFood = true;
+		if(hasFood)
+		{
+			HandleFood();
 		}
 
 		return true;
 	}
 
+	void HandleFood(){
+		
+	}
 
 	void HandleOperation()
 	{
 
-		if (screenInputDirectioin == ScreenInputDirectioin.none) {
+		if (snakeChangeDirection == SnakeChangeDirection.none) {
 			return;
 		}
 
 		Vector3 deltaVec3 = new Vector3();
-		if (screenInputDirectioin == ScreenInputDirectioin.left) {
+		if (snakeChangeDirection == SnakeChangeDirection.left) {
 			rotateAngle = 90f;
 			rotateBase = left_bottom.position;
 			rotateAxis = left_bottom.position - left_top.position;
 			deltaVec3 = left_bottom.position - right_bottom.position;
 
 		} 
-		else if (screenInputDirectioin == ScreenInputDirectioin.right) {
+		else if (snakeChangeDirection == SnakeChangeDirection.right) {
 			rotateAngle = 90f;
 			rotateBase = right_bottom.position;
 			rotateAxis = right_top.position - right_bottom.position;
@@ -144,6 +154,7 @@ public class SnakeCubeHead : MonoBehaviour {
 
 
 		willRotate = true;
+		willRotateCamera = false;
 
 
 		transform.RotateAround (rotateBase,rotateAxis,rotateAngle);
@@ -215,9 +226,10 @@ public class SnakeCubeHead : MonoBehaviour {
 		}
 
 		willRotate = true;
+		willRotateCamera = true;
 
-		Vector3 vecCurrent = Utils.getVector3ByFaceIndex (currentFaceIndex);
-		Vector3 vecNext = Utils.getVector3ByFaceIndex (nextFaceIndex);
+		Vector3 vecCurrent = Utils.GetVector3ByFaceIndex (currentFaceIndex);
+		Vector3 vecNext = Utils.GetVector3ByFaceIndex (nextFaceIndex);
 		rotateAxis = Vector3.Cross (vecCurrent, vecNext);
 
 		rotateBase = 0.5f * (right_bottom.position + left_bottom.position );
@@ -236,9 +248,9 @@ public class SnakeCubeHead : MonoBehaviour {
 	}
 
 
-	public void HandleInput (ScreenInputDirectioin sid)
+	public void HandleInput (SnakeChangeDirection scd)
 	{
-		screenInputDirectioin = sid;
+		snakeChangeDirection = scd;
 	}
 
 
@@ -257,11 +269,12 @@ public class SnakeCubeHead : MonoBehaviour {
 			//rotating = true;
 			willRotate = false;
 			StartCoroutine (IRotate());
-					
+				
+
 		} else {
 
 			updateMove = (targetPos - transform.localPosition) / moveTime;
-			moving = true;
+			//moving = true;
 			StartCoroutine (IMove());
 		}
 
@@ -278,7 +291,7 @@ public class SnakeCubeHead : MonoBehaviour {
 			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
 			yield return new WaitForEndOfFrame ();
 		}
-		moving = false;
+		//moving = false;
 
 
 	}
@@ -292,11 +305,13 @@ public class SnakeCubeHead : MonoBehaviour {
 		{
 			rotatedAngle += updateRotate*Time.deltaTime;
 			transform.RotateAround (rotateBase, rotateAxis,updateRotate*Time.deltaTime);
-			cameraFocusTransform.eulerAngles = transform.eulerAngles;
+			if (willRotateCamera) {
+				cameraFocusTransform.RotateAround (cameraFocusTransform.position, rotateAxis,updateRotate*Time.deltaTime);
+			}
 			yield return new WaitForEndOfFrame ();
 		}
 
-
+		willRotate = false;
 	}
 
 	public void Init(CubePos cp, CubePos dcp, float cd, float mt ,int md , FaceIndex cfi){
@@ -316,6 +331,11 @@ public class SnakeCubeHead : MonoBehaviour {
 
 		deltaCubePos = delta;
 
+	}
+
+	public Vector3 GetCurrentDirection(){
+	
+		return deltaCubePos.ToVec3 (cubeDistance);
 	}
 
 }

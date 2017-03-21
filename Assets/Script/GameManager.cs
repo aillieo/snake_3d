@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour {
 	public FixedCube fixedCube;
 	public SnakeCube snakeCube;
 	public SnakeCubeHead snakeCubeHead;
+	public Food food;
 
 	List<SnakeCube> snakeCubes = new List<SnakeCube> ();
 
