@@ -8,6 +8,7 @@ public class CubeWithPos : MonoBehaviour {
 	protected float cubeDistance;
 	protected Vector3 targetPos;
 	protected Vector3 updateMove;
+	protected CubePos nextCubePos;
 
 	// Use this for initialization
 	void Start () {
@@ -32,6 +33,10 @@ public class CubeWithPos : MonoBehaviour {
 
 		StartCoroutine(IMove());
 
+	}
+
+	public CubePos GetNextCubePos(){
+		return nextCubePos;
 	}
 
 	protected IEnumerator IMove()

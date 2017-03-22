@@ -45,13 +45,19 @@ public class GameManager : MonoBehaviour {
 		
 		if (checkMoveTimer()) {
 
-			//float cubeOffset = config.cubeSize + config.gapSize;
+			CubePos cpToBeEmpty =  snakeCubes [snakeCubes.Count - 1].GetCubePos ();
+			cubePosEmpty [cpToBeEmpty.GetIndex (config.matrixDim)] = true;
 
 			foreach (SnakeCube sc in snakeCubes) {
 				sc.PreMove ();
 			}
 
-			if (snakeCubeHead.CheckHead ()) {
+			bool moveSnake = snakeCubeHead.CheckHead ();
+
+			CubePos cpToBeFull =  snakeCubeHead.GetNextCubePos ();
+			cubePosEmpty [cpToBeFull.GetIndex (config.matrixDim)] = false;
+
+			if (moveSnake) {
 			
 				snakeCubeHead.Move ();
 				foreach (SnakeCube sc in snakeCubes) {
@@ -60,7 +66,8 @@ public class GameManager : MonoBehaviour {
 			
 			}
 
-			// for text only
+
+
 
 		
 		}
@@ -99,6 +106,9 @@ public class GameManager : MonoBehaviour {
 						int key = cp.GetIndex(dim);
 						//Debug.Log (key.ToString() + "-----" + i.ToString() + " " + j.ToString() + " "+ k.ToString() + " ");
 						cubePosEmpty.Add (key,true);
+
+
+
 
 
 					}
@@ -151,7 +161,7 @@ public class GameManager : MonoBehaviour {
 			sc.transform.parent = GameObject.Find ("BasePoint").transform;
 			sc.transform.localPosition = new Vector3 (x, y, z);
 			sc.SetMovePara (cubeOffset, moveTime);
-			CubePos thisCubePos = Utils.CubePos (cp.x, cp.y + i, cp.z);
+			CubePos thisCubePos = Utils.CubePos (cp.x, cp.y - 4 + i, cp.z);
 			sc.SetCubePos(thisCubePos);
 			cubePosEmpty [thisCubePos.GetIndex(dim)] = false;
 

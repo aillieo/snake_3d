@@ -6,7 +6,6 @@ public class SnakeCube : CubeWithPos {
 
 
 	CubeWithPos nextSnakeCube;
-	CubePos nextCubePos;
 	float moveTime;
 	//bool moving = false;
 

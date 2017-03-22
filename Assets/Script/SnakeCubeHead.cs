@@ -109,12 +109,18 @@ public class SnakeCubeHead : CubeWithPos {
 		}
 
 
+
+
+
 		// whether there is food before snake
 		bool hasFood = true;
 		if(hasFood)
 		{
 			HandleFood();
 		}
+
+
+		nextCubePos = nextCubePos.AddDelta(deltaCubePos);
 
 		return true;
 	}
@@ -157,6 +163,9 @@ public class SnakeCubeHead : CubeWithPos {
 		transform.RotateAround (rotateBase,rotateAxis,rotateAngle);
 		targetRot = transform.eulerAngles;
 		transform.RotateAround (rotateBase,rotateAxis,-rotateAngle);
+
+
+		nextCubePos = nextCubePos.AddDelta(deltaCubePos);
 
 	}
 
@@ -240,7 +249,7 @@ public class SnakeCubeHead : CubeWithPos {
 
 		currentFaceIndex = nextFaceIndex;
 
-
+		nextCubePos = nextCubePos.AddDelta(deltaCubePos);
 
 	}
 
@@ -254,10 +263,8 @@ public class SnakeCubeHead : CubeWithPos {
 	override public void Move(){
 	
 
-		cubePos.x += deltaCubePos.x;
-		cubePos.y += deltaCubePos.y;
-		cubePos.z += deltaCubePos.z;
-		targetPos = new Vector3 (cubePos.x * cubeDistance, cubePos.y * cubeDistance, cubePos.z * cubeDistance);
+		cubePos = nextCubePos;
+		targetPos = cubePos.ToVec3 (cubeDistance);
 
 		if (willRotate) {
 
@@ -299,6 +306,8 @@ public class SnakeCubeHead : CubeWithPos {
 		transform.eulerAngles = targetRot;
 	}
 
+
+
 	public void Init(CubePos cp, CubePos dcp, float cd, float mt ,int md , FaceIndex cfi){
 
 		cubePos = cp;
@@ -308,7 +317,9 @@ public class SnakeCubeHead : CubeWithPos {
 		moveDim = md;
 		currentFaceIndex = cfi;
 
-		targetPos = new Vector3(cubePos.x * cubeDistance, cubePos.y * cubeDistance , cubePos.z * cubeDistance);
+		nextCubePos = cubePos;
+		targetPos = nextCubePos.ToVec3(cubeDistance);
+
 
 	}
 

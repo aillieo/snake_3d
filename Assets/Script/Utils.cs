@@ -63,18 +63,27 @@ public static class Utils
 	{
 		return new Vector3 ((float)cp.x * cubeSize, (float)cp.y * cubeSize, (float)cp.z * cubeSize);
 	}
+		
 
 	public static int GetIndex(this CubePos cp, int dim)
 	{
 		return cp.x * (dim+2)* (dim+2) + cp.y * (dim+2) + cp.z;
 	}
 
-	public static CubePos CubePos(int i , int j , int k)
+	public static CubePos CubePos(int i, int j, int k)
 	{
 		CubePos cp;
 		cp.x = i;
 		cp.y = j;
 		cp.z = k;
+		return cp;
+	}
+
+	public static CubePos AddDelta(this CubePos cp, CubePos deltaCubePos)
+	{
+		cp.x += deltaCubePos.x;
+		cp.y += deltaCubePos.y;
+		cp.z += deltaCubePos.z;
 		return cp;
 	}
 
