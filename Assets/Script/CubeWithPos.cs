@@ -47,7 +47,7 @@ public class CubeWithPos : MonoBehaviour {
 		{
 			movedDis += updateMove.magnitude * Time.deltaTime;
 			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
-			yield return new WaitForEndOfFrame ();
+			yield return new WaitForFixedUpdate ();
 		}
 		transform.localPosition = targetPos;
 

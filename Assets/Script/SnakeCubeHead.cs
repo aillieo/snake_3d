@@ -299,7 +299,7 @@ public class SnakeCubeHead : CubeWithPos {
 			if (willRotateCamera) {
 				cameraFocusTransform.RotateAround (cameraFocusTransform.position, rotateAxis,updateRotate*Time.deltaTime);
 			}
-			yield return new WaitForEndOfFrame ();
+			yield return new WaitForFixedUpdate ();
 		}
 
 		willRotate = false;
