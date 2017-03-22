@@ -3,25 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class SnakeCubeHead : MonoBehaviour {
+public class SnakeCubeHead : CubeWithPos {
 
 
-	float cubeDistance;
+
 	int moveDim;
 	float moveTime;
 
 	FaceIndex currentFaceIndex;
 	FaceIndex nextFaceIndex;
 
-	CubePos cubePos;
 	CubePos deltaCubePos;
 
 	//bool moving = false;
 	//bool rotating = false;
 
-	Vector3 updateMove;
+
 	float updateRotate;
-	Vector3 targetPos;
+
 	Vector3 targetRot;
 	Vector3 rotateAxis;
 	Vector3 rotateBase;
@@ -62,8 +61,7 @@ public class SnakeCubeHead : MonoBehaviour {
 		// change snake to target state
 		//moving = false;
 		//rotating = false;
-		transform.localPosition = targetPos;
-		transform.eulerAngles = targetRot;
+
 
 
 
@@ -147,10 +145,9 @@ public class SnakeCubeHead : MonoBehaviour {
 			deltaVec3 = right_bottom.position - left_bottom.position;
 		}
 
+		deltaCubePos = Utils.CubePos (deltaVec3);
 
-		deltaCubePos.x = (int)deltaVec3.x;
-		deltaCubePos.y = (int)deltaVec3.y;
-		deltaCubePos.z = (int)deltaVec3.z;
+		//Debug.Log (deltaCubePos.x.ToString() + "," + deltaCubePos.y.ToString() + "," + deltaCubePos.z.ToString());
 
 
 		willRotate = true;
@@ -254,7 +251,7 @@ public class SnakeCubeHead : MonoBehaviour {
 	}
 
 
-	public void Move(){
+	override public void Move(){
 	
 
 		cubePos.x += deltaCubePos.x;
@@ -281,20 +278,7 @@ public class SnakeCubeHead : MonoBehaviour {
 	}
 
 
-	IEnumerator IMove()
-	{
 
-		float movedDis = 0;
-		while(movedDis < cubeDistance)
-		{
-			movedDis += updateMove.magnitude * Time.deltaTime;
-			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
-			yield return new WaitForEndOfFrame ();
-		}
-		//moving = false;
-
-
-	}
 
 
 	IEnumerator IRotate()
@@ -312,6 +296,7 @@ public class SnakeCubeHead : MonoBehaviour {
 		}
 
 		willRotate = false;
+		transform.eulerAngles = targetRot;
 	}
 
 	public void Init(CubePos cp, CubePos dcp, float cd, float mt ,int md , FaceIndex cfi){

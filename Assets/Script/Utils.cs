@@ -40,7 +40,6 @@ public struct CubePos
 
 
 
-
 public static class Utils
 {
 	public static void SetComponentX(this Transform trans , float x)
@@ -65,7 +64,31 @@ public static class Utils
 		return new Vector3 ((float)cp.x * cubeSize, (float)cp.y * cubeSize, (float)cp.z * cubeSize);
 	}
 
+	public static int GetIndex(this CubePos cp, int dim)
+	{
+		return cp.x * (dim+2)* (dim+2) + cp.y * (dim+2) + cp.z;
+	}
 
+	public static CubePos CubePos(int i , int j , int k)
+	{
+		CubePos cp;
+		cp.x = i;
+		cp.y = j;
+		cp.z = k;
+		return cp;
+	}
+
+	public static CubePos CubePos(Vector3 vec3)
+	{
+		CubePos cp;
+		int ix = (int)vec3.x;
+		int iy = (int)vec3.y;
+		int iz = (int)vec3.z;
+		cp.x = ix>0 ? 1 : (ix<0 ? -1 : 0);
+		cp.y = iy>0 ? 1 : (iy<0 ? -1 : 0);
+		cp.z = iz>0 ? 1 : (iz<0 ? -1 : 0);
+		return cp;
+	}
 
 
 	public static Vector3 GetVector3ByFaceIndex(FaceIndex fi)

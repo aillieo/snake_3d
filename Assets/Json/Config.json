@@ -1,5 +1,5 @@
 {
-	"matrixDim" : 7,
+	"matrixDim" : 3,
 	"gapSize" : 0.2,
 	"cubeSize" : 1.6,
 	"moveInterval" : 0.5

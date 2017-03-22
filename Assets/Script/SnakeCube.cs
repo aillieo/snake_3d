@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SnakeCube : MonoBehaviour {
+public class SnakeCube : CubeWithPos {
 
 
-	Transform nextSnakeCubeTrans;
-	Vector3 nextPos;
+	CubeWithPos nextSnakeCube;
+	CubePos nextCubePos;
 	float moveTime;
-	float moveDistance;
-	bool moving = false;
-	Vector3 updateMove;
+	//bool moving = false;
+
 
 	// Use this for initialization
 	void Start () {
@@ -23,45 +22,37 @@ public class SnakeCube : MonoBehaviour {
 
 	}
 
-	public void SetNextSnakeCubeTrans( Transform trans){
+	public void SetNextSnakeCube( CubeWithPos cwp ){
 
-		nextSnakeCubeTrans = trans;
+		nextSnakeCube = cwp;
 	}
 
-	public void SetMovePara(float md , float mt){
+	public void SetMovePara(float cd , float mt){
 
-		moveDistance = md;
+		cubeDistance = cd;
 		moveTime = mt;
 	
 	}
 
+
 	public void PreMove(){
 
-		nextPos = nextSnakeCubeTrans.localPosition;
+		targetPos = nextSnakeCube.transform.localPosition;
+		nextCubePos = nextSnakeCube.GetCubePos ();
 
 	}
 
-	public void Move(){
+	override public void  Move() {
 	
 		//transform.localPosition = nextPos;
-		updateMove = (nextPos - transform.localPosition) / moveTime;
+		updateMove = (targetPos - transform.localPosition) / moveTime;
 		//moving = true;
 		StartCoroutine(IMove());
 
-	}
-
-	IEnumerator IMove(){
-
-		float movedDis = 0;
-		while (movedDis <= moveDistance) {
-		
-			movedDis += updateMove.magnitude * Time.deltaTime;
-			transform.localPosition = transform.localPosition + updateMove * Time.deltaTime;
-			yield return new WaitForEndOfFrame ();
-		
-		}
-		transform.localPosition = nextPos;
+		cubePos = nextCubePos;
 
 	}
+
+
 
 }
