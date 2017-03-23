@@ -70,6 +70,23 @@ public static class Utils
 		return cp.x * (dim+2)* (dim+2) + cp.y * (dim+2) + cp.z;
 	}
 
+	public static CubePos GetCubePosByIndex(int index, int dim){
+
+		int z = index % (dim + 2);
+		index -= z;
+		index /= (dim + 2);
+		int y = index % (dim + 2);
+		index -= y;
+		index /= (dim + 2);
+		int x = index;
+
+		//Debug.Log ( "-----" + x.ToString() + " " + y.ToString() + " "+ z.ToString() + " ");
+
+
+		return CubePos (x,y,z);
+
+	}
+
 	public static CubePos CubePos(int i, int j, int k)
 	{
 		CubePos cp;

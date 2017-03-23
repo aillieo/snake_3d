@@ -66,6 +66,10 @@ public class GameManager : MonoBehaviour {
 			
 			}
 
+			if (food.NeedReset()) {
+			
+				ResetFood ();
+			}
 
 
 
@@ -74,6 +78,64 @@ public class GameManager : MonoBehaviour {
 		
 	}
 
+
+	void ResetFood()
+	{
+		
+		int newIndex = -1;
+		int count = cubePosEmpty.Count;
+
+		int rand = UnityEngine.Random.Range (0,count-1);
+		List<int> keysBeforeRand = new List<int>();
+	
+		int iter = 0;
+
+		// keys equal and after rand
+		foreach (KeyValuePair<int,bool> item in cubePosEmpty) {
+
+			if (iter < rand) {
+				iter++;
+				keysBeforeRand.Add (item.Key);
+			} else {
+				if (item.Value) {
+
+					newIndex = item.Key;
+					break;
+				}
+			}
+		
+		}
+
+
+		// keys before rand
+		if(newIndex == -1)
+		{
+			for (int i = 0; i < rand; i++) {
+
+				if (cubePosEmpty [keysBeforeRand[i]]) {
+
+					newIndex = keysBeforeRand[i];
+					break;
+				}
+
+			}
+		}
+
+		if (newIndex != -1) {
+
+			food.SetCubePos (Utils.GetCubePosByIndex(newIndex,config.matrixDim));
+
+		
+		} else {
+
+
+			// no more empty position to place food
+			// game over
+
+
+		}
+
+	}
 
 
 	void InitCubeMatrix(){
@@ -123,12 +185,9 @@ public class GameManager : MonoBehaviour {
 		int dim = config.matrixDim;
 		float cubeOffset = config.cubeSize;
 		float scale = config.cubeSize;
-		CubePos cp;
+		CubePos cp = Utils.CubePos (0, 4, 0);
 		float moveTime = 0.9f * config.moveInterval;
 
-		cp.x = 0;
-		cp.y = 4;
-		cp.z = 0;
 		if (dim % 2 == 0) {
 			cp.x = dim / 2 ;
 		} 
@@ -186,6 +245,27 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void InitFood(){
+
+		int dim = config.matrixDim;
+		float cubeOffset = config.cubeSize;
+		float scale = config.cubeSize;
+		CubePos cp = Utils.CubePos (0,dim,0);
+		if (dim % 2 == 0) {
+			cp.x = dim / 2 ;
+		} 
+		else {
+			cp.x = (dim + 1) / 2 ;
+		}
+
+		food = Instantiate (food) as Food;
+		food.transform.localScale = new Vector3 (scale,scale,scale);
+		food.transform.parent = GameObject.Find ("BasePoint").transform;
+		//food.transform.localPosition = cp.ToVec3 (cubeOffset);
+		food.Init (cubeOffset);
+		food.SetCubePos(cp);
+
+		snakeCubeHead.SetFood (food);
+
 	}
 
 

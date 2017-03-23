@@ -34,14 +34,16 @@ public class SnakeCubeHead : CubeWithPos {
 	bool willRotate = false;
 	bool willRotateCamera = false;
 
-	Transform cameraFocusTransform;
+	CameraFocus cameraFocus;
+
+	Food food;
 
 	SnakeChangeDirection snakeChangeDirection = SnakeChangeDirection.none;
 
 	// Use this for initialization
 	void Start () {
 
-		cameraFocusTransform = GameObject.Find("CameraFocus").transform;
+		cameraFocus = GameObject.Find("CameraFocus").GetComponent<CameraFocus>();
 		left_bottom = GameObject.Find("Left_Bottom").transform;
 		right_bottom = GameObject.Find("Right_Bottom").transform;
 		left_top = GameObject.Find("Left_Top").transform;
@@ -126,7 +128,15 @@ public class SnakeCubeHead : CubeWithPos {
 	}
 
 	void HandleFood(){
-		
+
+
+
+
+
+		//...
+
+		food.OnAte ();
+
 	}
 
 	void HandleOperation()
@@ -273,6 +283,9 @@ public class SnakeCubeHead : CubeWithPos {
 			//rotating = true;
 			willRotate = false;
 			StartCoroutine (IRotate());
+			if (willRotateCamera) {
+				cameraFocus.Rotate(rotateAxis,updateRotate,targetRot);
+			}
 				
 
 		} else {
@@ -296,9 +309,6 @@ public class SnakeCubeHead : CubeWithPos {
 		{
 			rotatedAngle += updateRotate*Time.deltaTime;
 			transform.RotateAround (rotateBase, rotateAxis,updateRotate*Time.deltaTime);
-			if (willRotateCamera) {
-				cameraFocusTransform.RotateAround (cameraFocusTransform.position, rotateAxis,updateRotate*Time.deltaTime);
-			}
 			yield return new WaitForFixedUpdate ();
 		}
 
@@ -332,6 +342,12 @@ public class SnakeCubeHead : CubeWithPos {
 	public Vector3 GetCurrentDirection(){
 	
 		return deltaCubePos.ToVec3 (cubeDistance);
+	}
+
+
+	public void SetFood(Food f)
+	{
+		food = f;
 	}
 
 }
