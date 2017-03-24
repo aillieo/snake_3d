@@ -37,6 +37,7 @@ public class SnakeCubeHead : CubeWithPos {
 	CameraFocus cameraFocus;
 
 	Food food;
+	bool willGrow = false;
 
 	SnakeChangeDirection snakeChangeDirection = SnakeChangeDirection.none;
 
@@ -64,7 +65,7 @@ public class SnakeCubeHead : CubeWithPos {
 		//moving = false;
 		//rotating = false;
 
-
+		willGrow = false;
 
 
 		// whether snake head need rotate over edge
@@ -112,30 +113,20 @@ public class SnakeCubeHead : CubeWithPos {
 
 
 
-
-
-		// whether there is food before snake
-		bool hasFood = true;
-		if(hasFood)
-		{
-			HandleFood();
-		}
-
-
-		nextCubePos = nextCubePos.AddDelta(deltaCubePos);
+		nextCubePos = nextCubePos + deltaCubePos;
+		CheckFood ();
 
 		return true;
 	}
 
-	void HandleFood(){
+	void CheckFood(){
 
+		// whether there is food before snake
 
-
-
-
-		//...
-
-		food.OnAte ();
+		if(nextCubePos == food.getCubePos())
+		{
+			willGrow = true;
+		}
 
 	}
 
@@ -161,7 +152,7 @@ public class SnakeCubeHead : CubeWithPos {
 			deltaVec3 = right_bottom.position - left_bottom.position;
 		}
 
-		deltaCubePos = Utils.CubePos (deltaVec3);
+		deltaCubePos = new CubePos (deltaVec3);
 
 		//Debug.Log (deltaCubePos.x.ToString() + "," + deltaCubePos.y.ToString() + "," + deltaCubePos.z.ToString());
 
@@ -175,7 +166,8 @@ public class SnakeCubeHead : CubeWithPos {
 		transform.RotateAround (rotateBase,rotateAxis,-rotateAngle);
 
 
-		nextCubePos = nextCubePos.AddDelta(deltaCubePos);
+		nextCubePos = nextCubePos + deltaCubePos;
+		CheckFood ();
 
 	}
 
@@ -259,7 +251,8 @@ public class SnakeCubeHead : CubeWithPos {
 
 		currentFaceIndex = nextFaceIndex;
 
-		nextCubePos = nextCubePos.AddDelta(deltaCubePos);
+		nextCubePos = nextCubePos + deltaCubePos;
+		CheckFood ();
 
 	}
 
@@ -274,7 +267,7 @@ public class SnakeCubeHead : CubeWithPos {
 	
 
 		cubePos = nextCubePos;
-		targetPos = cubePos.ToVec3 (cubeDistance);
+		targetPos = cubePos.ToVec3 ();
 
 		if (willRotate) {
 
@@ -284,7 +277,7 @@ public class SnakeCubeHead : CubeWithPos {
 			willRotate = false;
 			StartCoroutine (IRotate());
 			if (willRotateCamera) {
-				cameraFocus.Rotate(rotateAxis,updateRotate,targetRot);
+				cameraFocus.Rotate(rotateAxis,updateRotate);
 			}
 				
 
@@ -328,7 +321,7 @@ public class SnakeCubeHead : CubeWithPos {
 		currentFaceIndex = cfi;
 
 		nextCubePos = cubePos;
-		targetPos = nextCubePos.ToVec3(cubeDistance);
+		targetPos = nextCubePos.ToVec3();
 
 
 	}
@@ -341,13 +334,18 @@ public class SnakeCubeHead : CubeWithPos {
 
 	public Vector3 GetCurrentDirection(){
 	
-		return deltaCubePos.ToVec3 (cubeDistance);
+		return deltaCubePos.ToVec3 ();
 	}
 
+	public bool WillGrow()
+	{
+		return willGrow;
+	}
 
-	public void SetFood(Food f)
+	public void InitFood(Food f)
 	{
 		food = f;
 	}
+
 
 }

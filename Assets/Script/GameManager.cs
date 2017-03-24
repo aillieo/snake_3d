@@ -30,6 +30,10 @@ public class GameManager : MonoBehaviour {
 		float baseOffset = (-0.5f)*(config.cubeSize*config.matrixDim);
 		GameObject.Find ("BasePoint").transform.position = new Vector3 (baseOffset,baseOffset,baseOffset);
 
+		CubePos.cubeSize = config.cubeSize;
+		CubePos.matrixDim = config.matrixDim;
+
+
 		InitCubeMatrix ();
 
 
@@ -46,7 +50,7 @@ public class GameManager : MonoBehaviour {
 		if (checkMoveTimer()) {
 
 			CubePos cpToBeEmpty =  snakeCubes [snakeCubes.Count - 1].GetCubePos ();
-			cubePosEmpty [cpToBeEmpty.GetIndex (config.matrixDim)] = true;
+			cubePosEmpty [cpToBeEmpty.GetIndex ()] = true;
 
 			foreach (SnakeCube sc in snakeCubes) {
 				sc.PreMove ();
@@ -55,21 +59,23 @@ public class GameManager : MonoBehaviour {
 			bool moveSnake = snakeCubeHead.CheckHead ();
 
 			CubePos cpToBeFull =  snakeCubeHead.GetNextCubePos ();
-			cubePosEmpty [cpToBeFull.GetIndex (config.matrixDim)] = false;
+			cubePosEmpty [cpToBeFull.GetIndex ()] = false;
+
+
+			if (snakeCubeHead.WillGrow()) {
+				AddSnakeCube ();
+				ResetFood ();
+			}
+
 
 			if (moveSnake) {
-			
 				snakeCubeHead.Move ();
 				foreach (SnakeCube sc in snakeCubes) {
 					sc.Move ();
 				}
-			
 			}
 
-			if (food.NeedReset()) {
-			
-				ResetFood ();
-			}
+
 
 
 
@@ -78,6 +84,28 @@ public class GameManager : MonoBehaviour {
 		
 	}
 
+	void AddSnakeCube()
+	{
+		/*
+		float cubeOffset = config.cubeSize;
+		float scale = config.cubeSize;
+		CubePos cp = snakeCubes [snakeCubes.Count - 1].GetCubePos ();
+		float moveTime = 0.9f * config.moveInterval;
+
+		SnakeCube sc = Instantiate (snakeCube) as SnakeCube;
+		sc.transform.localScale = new Vector3 (scale,scale,scale);
+		sc.transform.parent = GameObject.Find ("BasePoint").transform;
+		sc.transform.localPosition = cp.ToVec3();
+		sc.SetMovePara (cubeOffset, moveTime);
+		sc.SetCubePos(cp);
+		Debug.Log ("-----" + cp.x.ToString() + " " + cp.y.ToString() + " "+ cp.z.ToString() + " ");
+		cubePosEmpty [cp.GetIndex()] = false;
+
+		sc.SetNextSnakeCube (snakeCubes[snakeCubes.Count -1]);
+
+		snakeCubes.Add(sc);
+		*/
+	}
 
 	void ResetFood()
 	{
@@ -123,7 +151,7 @@ public class GameManager : MonoBehaviour {
 
 		if (newIndex != -1) {
 
-			food.SetCubePos (Utils.GetCubePosByIndex(newIndex,config.matrixDim));
+			food.SetCubePos (new CubePos(newIndex));
 
 		
 		} else {
@@ -158,25 +186,32 @@ public class GameManager : MonoBehaviour {
 						f.transform.parent = GameObject.Find ("BasePoint").transform;
 						f.transform.localPosition = new Vector3 (x, y, z);
 
-
-
 					}
 
-					else if (i * j * k * (dim + 1 - i) * (dim + 1 - j) * (dim + 1 - k) == 0) {
+					else if ( 
+						i * (dim + 1 - i)  == 0 && (j>0 && j< dim +1 ) && (k>0 && k< dim +1 ) ||
+						j * (dim + 1 - j)  == 0 && (k>0 && k< dim +1 ) && (i>0 && i< dim +1 ) ||
+						k * (dim + 1 - k)  == 0 && (i>0 && i< dim +1 ) && (j>0 && j< dim +1 ) ) {
 
-						CubePos cp = Utils.CubePos (i,j,k);
-						int key = cp.GetIndex(dim);
-						//Debug.Log (key.ToString() + "-----" + i.ToString() + " " + j.ToString() + " "+ k.ToString() + " ");
+						CubePos cp = new CubePos (i,j,k);
+						int key = cp.GetIndex();
+						// Debug.Log (key.ToString() + "-----" + i.ToString() + " " + j.ToString() + " "+ k.ToString() + " ");
 						cubePosEmpty.Add (key,true);
-
-
-
-
 
 					}
 				}
 			}
 		}
+
+		// Debug.Log (cubePosEmpty.Count.ToString());
+
+		FixedCube main = Instantiate (fixedCube, new Vector3(0,0,0), Quaternion.Euler (new Vector3 (0, 0, 0))) as FixedCube;
+		scale = cubeOffset * dim; 
+		main.transform.localScale = new Vector3 (scale,scale,scale);
+		main.transform.parent = GameObject.Find ("BasePoint").transform;
+		float position = cubeOffset * (dim+1) / 2;
+		main.transform.localPosition = new Vector3 (position,position,position);
+
 	}
 
 	void InitSnake(){
@@ -185,7 +220,7 @@ public class GameManager : MonoBehaviour {
 		int dim = config.matrixDim;
 		float cubeOffset = config.cubeSize;
 		float scale = config.cubeSize;
-		CubePos cp = Utils.CubePos (0, 4, 0);
+		CubePos cp = new CubePos (0, 4, 0);
 		float moveTime = 0.9f * config.moveInterval;
 
 		if (dim % 2 == 0) {
@@ -199,14 +234,14 @@ public class GameManager : MonoBehaviour {
 		float y = cp.y * cubeOffset;
 		float z = cp.z * cubeOffset;
 
-		CubePos deltaCubePos = Utils.CubePos(0,1,0);
+		CubePos deltaCubePos = new CubePos(0,1,0);
 
 		snakeCubeHead = Instantiate (snakeCubeHead) as SnakeCubeHead;
 		snakeCubeHead.transform.localScale = new Vector3 (scale,scale,scale);
 		snakeCubeHead.transform.parent = GameObject.Find ("BasePoint").transform;
 		snakeCubeHead.transform.localPosition = new Vector3 (x, y, z);
 		snakeCubeHead.Init (cp, deltaCubePos, cubeOffset, moveTime , config.matrixDim + 1, FaceIndex.z_neg);
-		cubePosEmpty [cp.GetIndex(dim)] = false;
+		cubePosEmpty [cp.GetIndex()] = false;
 
 		UIController uc = GameObject.Find ("UIController").GetComponent<UIController>();
 		uc.snakeCubeHead = snakeCubeHead;
@@ -220,9 +255,9 @@ public class GameManager : MonoBehaviour {
 			sc.transform.parent = GameObject.Find ("BasePoint").transform;
 			sc.transform.localPosition = new Vector3 (x, y, z);
 			sc.SetMovePara (cubeOffset, moveTime);
-			CubePos thisCubePos = Utils.CubePos (cp.x, cp.y - 4 + i, cp.z);
+			CubePos thisCubePos = new CubePos (cp.x, cp.y - 4 + i, cp.z);
 			sc.SetCubePos(thisCubePos);
-			cubePosEmpty [thisCubePos.GetIndex(dim)] = false;
+			cubePosEmpty [thisCubePos.GetIndex()] = false;
 
 
 			if(snakeCubes.Count == 0){
@@ -247,9 +282,8 @@ public class GameManager : MonoBehaviour {
 	void InitFood(){
 
 		int dim = config.matrixDim;
-		float cubeOffset = config.cubeSize;
 		float scale = config.cubeSize;
-		CubePos cp = Utils.CubePos (0,dim,0);
+		CubePos cp = new CubePos (0,dim,0);
 		if (dim % 2 == 0) {
 			cp.x = dim / 2 ;
 		} 
@@ -261,10 +295,10 @@ public class GameManager : MonoBehaviour {
 		food.transform.localScale = new Vector3 (scale,scale,scale);
 		food.transform.parent = GameObject.Find ("BasePoint").transform;
 		//food.transform.localPosition = cp.ToVec3 (cubeOffset);
-		food.Init (cubeOffset);
-		food.SetCubePos(cp);
 
-		snakeCubeHead.SetFood (food);
+		food.SetCubePos(cp);
+	
+		snakeCubeHead.InitFood (food);
 
 	}
 

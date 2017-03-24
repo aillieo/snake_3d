@@ -19,11 +19,17 @@ public class CameraFocus : MonoBehaviour {
 	}
 
 
-	public void Rotate(Vector3 axis, float uRotate, Vector3 tarRot)
+	public void Rotate(Vector3 axis, float uRotate)
 	{
 		updateRotate = uRotate;
 		rotateAxis = axis;
-		targetRot = tarRot;
+
+
+		transform.RotateAround (transform.position,rotateAxis,90);
+		targetRot = transform.eulerAngles;
+		transform.RotateAround (transform.position,rotateAxis,-90);
+
+
 		StartCoroutine (IRotate());
 
 	}
