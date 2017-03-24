@@ -58,7 +58,7 @@ public class SnakeCubeHead : CubeWithPos {
 
 	}
 
-	public bool CheckHead(){
+	public CubePos CheckHead(){
 
 
 		// change snake to target state
@@ -99,16 +99,13 @@ public class SnakeCubeHead : CubeWithPos {
 		}
 		if (nextFaceIndex != FaceIndex.none) {
 
-			HandleEdge ();
-			return true;
+			return HandleEdge ();
 		}
 
 		// whether there is a operation to handle
 		if(snakeChangeDirection != SnakeChangeDirection.none)
 		{
-			HandleOperation ();
-			snakeChangeDirection = SnakeChangeDirection.none;
-			return true;
+			return HandleOperation ();
 		}
 
 
@@ -116,7 +113,7 @@ public class SnakeCubeHead : CubeWithPos {
 		nextCubePos = nextCubePos + deltaCubePos;
 		CheckFood ();
 
-		return true;
+		return nextCubePos;
 	}
 
 	void CheckFood(){
@@ -130,13 +127,9 @@ public class SnakeCubeHead : CubeWithPos {
 
 	}
 
-	void HandleOperation()
+
+	CubePos HandleOperation()
 	{
-
-		if (snakeChangeDirection == SnakeChangeDirection.none) {
-			return;
-		}
-
 		Vector3 deltaVec3 = new Vector3();
 		if (snakeChangeDirection == SnakeChangeDirection.left) {
 			rotateAngle = 90f;
@@ -151,6 +144,8 @@ public class SnakeCubeHead : CubeWithPos {
 			rotateAxis = right_top.position - right_bottom.position;
 			deltaVec3 = right_bottom.position - left_bottom.position;
 		}
+
+		snakeChangeDirection = SnakeChangeDirection.none;
 
 		deltaCubePos = new CubePos (deltaVec3);
 
@@ -169,10 +164,12 @@ public class SnakeCubeHead : CubeWithPos {
 		nextCubePos = nextCubePos + deltaCubePos;
 		CheckFood ();
 
+		return nextCubePos;
+
 	}
 
 
-	void HandleEdge(){
+	CubePos HandleEdge(){
 
 		//Vector3 rotateOffset = new Vector3 (0, 0, 0);
 
@@ -254,6 +251,7 @@ public class SnakeCubeHead : CubeWithPos {
 		nextCubePos = nextCubePos + deltaCubePos;
 		CheckFood ();
 
+		return nextCubePos;
 	}
 
 

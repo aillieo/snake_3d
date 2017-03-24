@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
@@ -18,6 +19,8 @@ public class GameManager : MonoBehaviour {
 	Dictionary<int,bool> cubePosEmpty = new Dictionary<int,bool> ();
 
 	float moveTimer = 0;
+
+	Text labelSnakeLength;
 
 	// Use this for initialization
 	void Start () {
@@ -42,12 +45,15 @@ public class GameManager : MonoBehaviour {
 
 		InitFood ();
 
+
+		InitUI ();
+
 	}
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 		
-		if (checkMoveTimer()) {
+		if (CheckMoveTimer()) {
 
 			CubePos cpToBeEmpty =  snakeCubes [snakeCubes.Count - 1].GetCubePos ();
 			cubePosEmpty [cpToBeEmpty.GetIndex ()] = true;
@@ -56,23 +62,29 @@ public class GameManager : MonoBehaviour {
 				sc.PreMove ();
 			}
 
-			bool moveSnake = snakeCubeHead.CheckHead ();
+			CubePos nextHeadPos = snakeCubeHead.CheckHead ();
 
-			CubePos cpToBeFull =  snakeCubeHead.GetNextCubePos ();
-			cubePosEmpty [cpToBeFull.GetIndex ()] = false;
 
 
 			if (snakeCubeHead.WillGrow()) {
 				AddSnakeCube ();
+				labelSnakeLength.text = ("Length:" + (snakeCubes.Count+1).ToString());
 				ResetFood ();
 			}
 
 
-			if (moveSnake) {
+			if (CheckCrash (nextHeadPos)) {
+
+				CubePos cpToBeFull =  snakeCubeHead.GetNextCubePos ();
+				cubePosEmpty [cpToBeFull.GetIndex ()] = false;
+
 				snakeCubeHead.Move ();
 				foreach (SnakeCube sc in snakeCubes) {
 					sc.Move ();
 				}
+			} else {
+
+				GameOver ();
 			}
 
 
@@ -98,7 +110,7 @@ public class GameManager : MonoBehaviour {
 		sc.transform.localPosition = cp.ToVec3();
 		sc.SetMovePara (cubeOffset, moveTime);
 		sc.SetCubePos(cp);
-		Debug.Log ("-----" + cp.x.ToString() + " " + cp.y.ToString() + " "+ cp.z.ToString() + " ");
+		// Debug.Log ("-----" + cp.x.ToString() + " " + cp.y.ToString() + " "+ cp.z.ToString() + " ");
 		cubePosEmpty [cp.GetIndex()] = false;
 
 		sc.SetNextSnakeCube (snakeCubes[snakeCubes.Count -1]);
@@ -160,10 +172,16 @@ public class GameManager : MonoBehaviour {
 
 			// no more empty position to place food
 			// game over
-
+			GameOver();
 
 		}
 
+	}
+
+	bool CheckCrash(CubePos headPos)
+	{
+
+		return cubePosEmpty[headPos.GetIndex()];
 	}
 
 
@@ -178,7 +196,8 @@ public class GameManager : MonoBehaviour {
 				for (int k = 0; k < dim+2; k++){
 
 					if (((i-1) * (j-1) * (k-1) * (dim - i) * (dim - j) * (dim - k) == 0)&&(i>0 && i < dim +1 && j > 0 && j < dim +1 && k > 0 && k < dim+1)) {
-
+					// fixed cubes as ground for snake to move
+					
 						float x = i * cubeOffset;
 						float y = j * cubeOffset;
 						float z = k * cubeOffset;
@@ -189,11 +208,17 @@ public class GameManager : MonoBehaviour {
 
 					}
 
-					else if ( 
-						i * (dim + 1 - i)  == 0 && (j>0 && j< dim +1 ) && (k>0 && k< dim +1 ) ||
-						j * (dim + 1 - j)  == 0 && (k>0 && k< dim +1 ) && (i>0 && i< dim +1 ) ||
-						k * (dim + 1 - k)  == 0 && (i>0 && i< dim +1 ) && (j>0 && j< dim +1 ) ) {
+					else if (i * j * k * (dim + 1 - i) * (dim + 1 - j) * (dim + 1 - k) == 0) {
+					// positions that food will appear
 
+
+						if(
+							(i == 0 || i == dim + 1 ) && 
+							(j == 0 || j == dim + 1 ) &&
+							(k == 0 || k == dim + 1 ) ){
+							// 8 positions that snake cant reach 
+							continue;
+						}
 						CubePos cp = new CubePos (i,j,k);
 						int key = cp.GetIndex();
 						// Debug.Log (key.ToString() + "-----" + i.ToString() + " " + j.ToString() + " "+ k.ToString() + " ");
@@ -244,8 +269,8 @@ public class GameManager : MonoBehaviour {
 		snakeCubeHead.Init (cp, deltaCubePos, cubeOffset, moveTime , config.matrixDim + 1, FaceIndex.z_neg);
 		cubePosEmpty [cp.GetIndex()] = false;
 
-		UIController uc = GameObject.Find ("UIController").GetComponent<UIController>();
-		uc.snakeCubeHead = snakeCubeHead;
+		InputController ic = GameObject.Find ("InputController").GetComponent<InputController>();
+		ic.snakeCubeHead = snakeCubeHead;
 
 
 		for(int i = 3 ; i > 0 ; i--)
@@ -303,11 +328,15 @@ public class GameManager : MonoBehaviour {
 	}
 
 
+	void InitUI()
+	{
+		labelSnakeLength = GameObject.Find ("LabelLength").GetComponent<Text> ();
+		labelSnakeLength.text = ("Length:" + (snakeCubes.Count+1).ToString());
+	}
 
 
 
-
-	bool checkMoveTimer(){
+	bool CheckMoveTimer(){
 
 		moveTimer += Time.deltaTime;
 		if (moveTimer > config.moveInterval) {
@@ -351,6 +380,13 @@ public class GameManager : MonoBehaviour {
 		public float cubeSize;
 		public float moveInterval;
 
+	}
+
+
+	void GameOver()
+	{
+		Debug.Log ("GAME OVER");
+		Time.timeScale = 0;
 	}
 
 

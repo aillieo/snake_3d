@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIController : MonoBehaviour {
+public class InputController : MonoBehaviour {
 
 
 	public SnakeCubeHead snakeCubeHead;
@@ -82,10 +82,10 @@ public class UIController : MonoBehaviour {
 		float angle = Utils.GetAngleWithDirection (snakeVec2, screenVec2);
 		// Debug.Log ("snake= "+snakeVec2.ToString() + "     input= " + screenVec2.ToString() + "     angle= " + angle.ToString());
 
-		if (angle > 70 && angle < 110 ) {
+		if (angle > 60 && angle < 120 ) {
 			snakeCubeHead.HandleInput (SnakeChangeDirection.left);
 		}
-		else if(angle > -110 && angle < -70)
+		else if(angle > -120 && angle < -60)
 		{
 			snakeCubeHead.HandleInput (SnakeChangeDirection.right);
 		}
