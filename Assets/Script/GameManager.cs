@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour {
 
 	void AddSnakeCube()
 	{
-		/*
+		
 		float cubeOffset = config.cubeSize;
 		float scale = config.cubeSize;
 		CubePos cp = snakeCubes [snakeCubes.Count - 1].GetCubePos ();
@@ -102,9 +102,10 @@ public class GameManager : MonoBehaviour {
 		cubePosEmpty [cp.GetIndex()] = false;
 
 		sc.SetNextSnakeCube (snakeCubes[snakeCubes.Count -1]);
+		//sc.PreMove ();
 
 		snakeCubes.Add(sc);
-		*/
+
 	}
 
 	void ResetFood()
@@ -257,6 +258,7 @@ public class GameManager : MonoBehaviour {
 			sc.SetMovePara (cubeOffset, moveTime);
 			CubePos thisCubePos = new CubePos (cp.x, cp.y - 4 + i, cp.z);
 			sc.SetCubePos(thisCubePos);
+			sc.SetReadyToMove ();
 			cubePosEmpty [thisCubePos.GetIndex()] = false;
 
 
@@ -272,8 +274,6 @@ public class GameManager : MonoBehaviour {
 
 
 		}
-
-
 
 
 

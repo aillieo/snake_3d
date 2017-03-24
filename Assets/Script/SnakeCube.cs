@@ -8,7 +8,7 @@ public class SnakeCube : CubeWithPos {
 	CubeWithPos nextSnakeCube;
 	float moveTime;
 	//bool moving = false;
-
+	bool willMove = false;
 
 	// Use this for initialization
 	void Start () {
@@ -24,6 +24,8 @@ public class SnakeCube : CubeWithPos {
 	public void SetNextSnakeCube( CubeWithPos cwp ){
 
 		nextSnakeCube = cwp;
+		nextCubePos = nextSnakeCube.GetCubePos ();
+
 	}
 
 	public void SetMovePara(float cd , float mt){
@@ -43,15 +45,24 @@ public class SnakeCube : CubeWithPos {
 
 	override public void  Move() {
 	
-		//transform.localPosition = nextPos;
-		updateMove = (targetPos - transform.localPosition) / moveTime;
-		//moving = true;
-		StartCoroutine(IMove());
+		if (willMove) {
 
-		cubePos = nextCubePos;
+			//transform.localPosition = nextPos;
+			updateMove = (targetPos - transform.localPosition) / moveTime;
+			//moving = true;
+			StartCoroutine (IMove ());
 
+			cubePos = nextCubePos;
+		} else {
+			willMove = true;
+		}
 	}
 
+
+	public void SetReadyToMove()
+	{
+		willMove = true;
+	}
 
 
 }

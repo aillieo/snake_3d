@@ -82,10 +82,10 @@ public class UIController : MonoBehaviour {
 		float angle = Utils.GetAngleWithDirection (snakeVec2, screenVec2);
 		// Debug.Log ("snake= "+snakeVec2.ToString() + "     input= " + screenVec2.ToString() + "     angle= " + angle.ToString());
 
-		if (angle > 80 && angle < 100) {
+		if (angle > 70 && angle < 110 ) {
 			snakeCubeHead.HandleInput (SnakeChangeDirection.left);
 		}
-		else if(angle > -100 && angle < -80)
+		else if(angle > -110 && angle < -70)
 		{
 			snakeCubeHead.HandleInput (SnakeChangeDirection.right);
 		}
